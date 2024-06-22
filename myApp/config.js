@@ -1,6 +1,8 @@
 const fs = require("fs");
 const myArgs = process.argv.slice(2);
 
+const { configjson } = require("./templates");
+
 function displayConfig() {
   if (DEBUG) console.log("config.displayConfig()");
   let fileName = "/json/config.json";
@@ -39,6 +41,18 @@ function setConfig() {
   });
 }
 
+function resetConfig() {
+  if (DEBUG) console.log("config.resetConfig()");
+  let configdata = JSON.stringify(configjson, null, 2);
+  // if(DEBUG) console.log(__dirname + './json/config.json');
+  // if(DEBUG) console.log(configdata);
+  fs.writeFile(__dirname + "/json/config.json", configdata, (error) => {
+    if (error) throw error;
+    if (DEBUG)
+      console.log("Config file succesfully reset to the original state");
+  });
+}
+
 function configApplication() {
   if (DEBUG) console.log("configApplication()");
 
@@ -49,6 +63,7 @@ function configApplication() {
       break;
     case "--reset":
       if (DEBUG) console.log("--reset");
+      resetConfig();
       break;
     case "--set":
       if (DEBUG) console.log("--set");
