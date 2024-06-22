@@ -4,6 +4,7 @@ Usage:
 
 myapp --help                            displays all help
 
+myapp init                              initialize the app
 myapp init --help                       displays help for the init command
 myapp init --all                        create the folder structure and the config and help files
 myapp init --mk                         create the folder structure
