@@ -39,10 +39,10 @@ function newToken(username) {
 
   newToken.created = `${format(now, "yyyy-MM-dd HH:mm:ss")}`;
   newToken.username = username;
-  //   let random = uuidv4();
-  //   newToken.token = crc32(username + random).toString(16);
+  let random = uuidv4();
+  newToken.token = crc32(username + random).toString(16);
   //   console.log(newToken.token);
-  newToken.token = crc32(username).toString(8);
+  // newToken.token = crc32(username).toString(8);
   newToken.expires = `${format(expires, "yyyy-MM-dd HH:mm:ss")}`;
   console.log(newToken);
 
