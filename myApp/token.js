@@ -98,6 +98,71 @@ function tokenApplication() {
   }
 }
 
+const DATA_FILE = path.join(__dirname, "myApp/json/tokens.json");
+
+function loadUsers(){
+  if(fs.existsSync(DATA_FILE)){
+    const data = fs.readFileSync(DATA_FILE);
+    return JSON.parse(data);
+  }
+  return [];
+};
+
+function searchUserByEmail(email){
+  const users = loadUsers();
+  return users.find(user => user.email === email);
+};
+
+function searchUserByName(username){
+  const users = loadUsers();
+  return users.find(user => user.username === username);
+}
+function searchUserByPhone(phone){
+  const users = loadUsers();
+  return users.find(user => user.phone === phone);
+}
+
+const emailToSearch = "kyle@example.com";
+const user = searchUserByEmail(emailToSearch);
+
+if(user){
+  console.log("user found!", user);
+}else{
+  console.log("user not found");
+}
+//save data to file
+function saveData(data){
+  fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2))
+};
+//add new user
+function addUser(user){
+  const data = loadUsers();
+  data.push(user);
+  saveData(data);
+  console.log("Item Added");
+}
+//update user
+function updateUser(username, updates){
+  const data = loadUsers();
+  const index = data.findIndex(item => item.username === username);
+  if (index !== -1){
+    if(updates.email){
+      data[index].email = updates.email;
+    }
+    if(updates.phone){
+      data[index].phone = updates.phone;
+    }
+    saveData(data);
+    console.log("Item updated");
+  } else{
+    console.log("Item not found");
+  }
+}
+
+const usernameToUpdate = "batman";
+const updates = {email: "batman@google.com", phone: "120938019" }
+updateUser(usernameToUpdate, updates);
+
 module.exports = {
   tokenApplication,
   newToken,
