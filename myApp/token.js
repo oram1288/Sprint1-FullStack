@@ -41,8 +41,6 @@ function newToken(username) {
   newToken.username = username;
   let random = uuidv4();
   newToken.token = crc32(username + random).toString(16);
-  //   console.log(newToken.token);
-  // newToken.token = crc32(username).toString(8);
   newToken.expires = `${format(expires, "yyyy-MM-dd HH:mm:ss")}`;
   console.log(newToken);
 
@@ -68,13 +66,28 @@ function addDays(date, days) {
   return result;
 }
 
+var tokenCount = function () {
+  if (DEBUG) console.log("token.tokenCount()");
+  return new Promise(function (resolve, reject) {
+    fs.readFile(__dirname + "/json/tokens.json", "utf-8", (error, data) => {
+      if (error) reject(error);
+      else {
+        let tokens = JSON.parse(data);
+        let count = Object.keys(tokens).length;
+        console.log(`Current token count is ${count}.`);
+        resolve(count);
+      }
+    });
+  });
+};
+
 function tokenApplication() {
   if (DEBUG) console.log("tokenApplication()");
 
   switch (myArgs[1]) {
     case "--count":
       if (DEBUG) console.log("--count");
-      //     tokenCount();
+      tokenCount();
       break;
     case "--list":
       if (DEBUG) console.log("--list");
@@ -100,71 +113,72 @@ function tokenApplication() {
 
 const DATA_FILE = path.join(__dirname, "myApp/json/tokens.json");
 
-function loadUsers(){
-  if(fs.existsSync(DATA_FILE)){
+function loadUsers() {
+  if (fs.existsSync(DATA_FILE)) {
     const data = fs.readFileSync(DATA_FILE);
     return JSON.parse(data);
   }
   return [];
-};
-
-function searchUserByEmail(email){
-  const users = loadUsers();
-  return users.find(user => user.email === email);
-};
-
-function searchUserByName(username){
-  const users = loadUsers();
-  return users.find(user => user.username === username);
 }
-function searchUserByPhone(phone){
+
+function searchUserByEmail(email) {
   const users = loadUsers();
-  return users.find(user => user.phone === phone);
+  return users.find((user) => user.email === email);
+}
+
+function searchUserByName(username) {
+  const users = loadUsers();
+  return users.find((user) => user.username === username);
+}
+function searchUserByPhone(phone) {
+  const users = loadUsers();
+  return users.find((user) => user.phone === phone);
 }
 
 const emailToSearch = "kyle@example.com";
 const user = searchUserByEmail(emailToSearch);
 
-if(user){
+if (user) {
   console.log("user found!", user);
-}else{
+} else {
   console.log("user not found");
 }
 //save data to file
-function saveData(data){
-  fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2))
-};
+function saveData(data) {
+  fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
+}
 //add new user
-function addUser(user){
+function addUser(user) {
   const data = loadUsers();
   data.push(user);
   saveData(data);
   console.log("Item Added");
 }
 //update user
-function updateUser(username, updates){
+function updateUser(username, updates) {
   const data = loadUsers();
-  const index = data.findIndex(item => item.username === username);
-  if (index !== -1){
-    if(updates.email){
+  const index = data.findIndex((item) => item.username === username);
+  if (index !== -1) {
+    if (updates.email) {
       data[index].email = updates.email;
     }
-    if(updates.phone){
+    if (updates.phone) {
       data[index].phone = updates.phone;
     }
     saveData(data);
     console.log("Item updated");
-  } else{
+  } else {
     console.log("Item not found");
   }
 }
 
 const usernameToUpdate = "batman";
-const updates = {email: "batman@google.com", phone: "120938019" }
+const updates = { email: "batman@google.com", phone: "120938019" };
 updateUser(usernameToUpdate, updates);
 
 module.exports = {
   tokenApplication,
   newToken,
   tokenList,
+  tokenCount,
 };
